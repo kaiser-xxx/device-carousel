@@ -11,7 +11,6 @@ const sec = document.querySelector(".dv-sec");
 const root = sec && sec.querySelector(".dv-pin");
 if (root && data.length) init();
 
-
 function init() {
   const n = data.length;
   const pad = (k) => String(k).padStart(2, "0");
@@ -90,7 +89,7 @@ function init() {
     raf = 0;
     const p = Math.min(1, (now - t0) / dur);
     cur = from + (to - from) * ease(p);
-    if (introAt && !reduce) intro = now - introAt;
+    if (introAt) intro = now - introAt;
     let busy = p < 1 || (introAt && intro < IN + GAP * n);
     devs.forEach((el, i) => {
       // intro: one by one, from the centre outward, each device slides down the path from the top right into its spot
@@ -201,6 +200,7 @@ function init() {
     };
     if (img.complete) fit(); else img.addEventListener("load", fit);
   });
+
   function onResize() { measure(); onScroll(); }
   addEventListener("scroll", onScroll, { passive: true });
   addEventListener("resize", onResize);

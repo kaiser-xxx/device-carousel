@@ -4,7 +4,8 @@
    One scroll gesture, swipe or arrow key moves one device along the diagonal; the centered
    device lifts. Clicking a device focuses it: it grows, the others fade back, corner
    brackets close in. The centered device's details always show top left. Clicking the focused device calls openDevice().
-   Esc, a click on empty space or a scroll unfocuses. Past the first or last device the page
+   While focused, scrolling moves the focus too.
+   Esc or a click on empty space unfocuses. Past the first or last device the page
    scrolls normally. Animates transforms and opacity only. */
 (function () {
   var data = window.DEVICES || [];
@@ -147,7 +148,7 @@
     var k = Math.max(0, Math.min(n - 1, Math.round(rel / step)));
     if (k !== index) {
       index = k; from = cur; to = k; t0 = performance.now();
-      if (focused !== k) focused = -1; // moving on unfocuses
+      if (focused >= 0) focused = k; // while focused, scrolling carries the focus along, same as clicking
       sync();
     }
     kick();

@@ -11,7 +11,6 @@
   var root = sec && sec.querySelector(".dv-pin");
   if (!root || !data.length) return;
   var n = data.length;
-  var START = 0; // the carousel opens on the first device
   var pad = function (k) { return String(k).padStart(2, "0"); };
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
 
@@ -19,36 +18,21 @@
   function openDevice(id) {}
 
   /* ---- render from data.js ---- */
-  // a square slot, mapped onto the screen with an affine matrix (isometric = parallel lines, so 3 corners are enough)
-  function screen(s) {
-    var p = s.at, ax = p[1][0] - p[0][0], ay = p[1][1] - p[0][1], bx = p[2][0] - p[0][0], by = p[2][1] - p[0][1];
-    var r = s.r || 0;
-    return '<span class="dv-scr"' + (s.clip ? ' style="clip-path:polygon(' + esc(s.clip) + ')"' : "") + '>' +
-      '<span class="dv-screen" style="left:' + p[0][0] + "%;top:" + p[0][1] + "%;transform:matrix(" +
-        [ax, ay, bx, by].map(function (v) { return (v / 100).toFixed(4); }).join(",") + ",0,0);border-radius:" +
-        (r / Math.hypot(ax, ay) * 100).toFixed(2) + "%/" + (r / Math.hypot(bx, by) * 100).toFixed(2) + '%">' +
-        (s.src ? '<img src="' + esc(s.src) + '" alt="" decoding="async">' : "") +
-      "</span></span>";
-  }
   root.querySelector(".dv-stage").innerHTML = data.map(function (d) {
     return '<a class="dv" href="' + esc(d.href || "#") + '" aria-label="' + esc(d.name + ": " + d.title) + '" tabindex="-1">' +
-      '<img src="' + esc(d.image) + '" alt="" draggable="false">' +
-      (d.screens || []).map(screen).join("") + "</a>";
+      '<img src="' + esc(d.image) + '" alt="" draggable="false"></a>';
   }).join("");
   root.querySelector(".dv-items").innerHTML = data.map(function (d, i) {
     return '<li class="dv-item"><h3 class="dv-title">' + esc(d.title) + '</h3><dl class="dv-rows">' +
       (d.keywords || []).map(function (f) { return '<div><dt class="mono">' + esc(f[0]) + "</dt><dd>" + esc(f[1]) + "</dd></div>"; }).join("") +
       '</dl><a class="dv-open mono" href="' + esc(d.href || "#") + '">Open device ' + pad(i + 1) + "</a></li>";
   }).join("");
-  var count = root.querySelector(".dv-count");
-  if (count) count.textContent = pad(n);
+  root.querySelector(".dv-count").textContent = pad(n);
   sec.style.setProperty("--n", n);
 
   var devs = [].slice.call(root.querySelectorAll(".dv"));
   var items = [].slice.call(root.querySelectorAll(".dv-item"));
-  var html = document.documentElement;
   var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  html.classList.add("dv-on");
 
   // corner brackets round the centered device: one size for all, centered on the device once its image loads
   var mid = devs.map(function () { return [0, 0]; }); // device's own center vs its image center, in units of D
@@ -65,7 +49,6 @@
         if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
       }
       if (x1 < x0) return;
-      var w = x1 - x0;
       // same size box on every device, centered on the device itself
       box.style.left = ((x0 + x1) / 2 - 38) + "%";
       box.style.top = ((y0 + y1) / 2 - 42) + "%";
@@ -97,7 +80,7 @@
     return { x: x, y: y, o: a > fade ? Math.max(0, 1 - (a - fade) / 0.5) : 1 };
   }
 
-  var index = START, cur = START, from = START, to = START, t0 = 0, dur = reduce ? 1 : 950, raf = 0;
+  var index = 0, cur = 0, from = 0, to = 0, t0 = 0, dur = reduce ? 1 : 950, raf = 0;
   var intro = reduce ? 1 : 0, introAt = 0;
   var tilt = devs.map(function () { return { x: 0, y: 0, tx: 0, ty: 0 }; });
   var ease = function (x) { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
@@ -136,11 +119,7 @@
 
   // the device in the middle follows the page position
   function onScroll() {
-    var rel = scrollY - secTop, range = step * (n - 1);
-    if (rel < -vh * 0.6 && intro >= 1 && !reduce) { intro = 0; introAt = 0; } // replay the intro next time
-    root.classList.toggle("dv-in", rel > -vh * 0.04 && rel < range + vh);
-    if (rel > -vh * 0.35 && !introAt && !reduce) introAt = performance.now(); // start turning in as the section arrives
-    var k = Math.max(0, Math.min(n - 1, Math.round(rel / step)));
+    var k = Math.max(0, Math.min(n - 1, Math.round((scrollY - secTop) / step)));
     if (k !== index) {
       index = k; from = cur; to = k; t0 = performance.now();
       sync();
@@ -220,9 +199,11 @@
   addEventListener("touchmove", onTouchMove, { passive: false });
   addEventListener("keydown", onKey);
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
-  measure(); sync(); go(START);
-  requestAnimationFrame(function () { requestAnimationFrame(function () { // after first paint, so the details and brackets fade in
-    onScroll();
+  measure(); sync(); onScroll();
+  requestAnimationFrame(function () { requestAnimationFrame(function () { // after first paint, so the device turns in first and the details and brackets fade in after
+    root.classList.add("dv-in");
+    if (!reduce) introAt = performance.now();
+    kick();
     if (document.fonts) document.fonts.ready.then(onResize); // the details block grows once the fonts land
   }); });
 })();

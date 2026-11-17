@@ -9,7 +9,6 @@ A scroll-driven carousel of isometric devices, built in plain HTML, CSS and Java
 - Corner brackets mark the centered device, and its title and details show top left.
 - Click a side device to bring it to the center. Click the centered device to open it.
 - Devices tilt toward the pointer.
-- Every device has a screen slot, so you can drop your own screenshots in.
 - Animates only transforms and opacity, so it stays smooth. Respects reduced motion.
 
 ## Use it
@@ -26,7 +25,6 @@ To use your own content, edit the `DEVICES` array in `data.js`:
   title: "Night Shift",
   keywords: [["Role", "UI designer"], ["Platform", "iOS"], ["Year", "2024"], ["Type", "App"]],
   image: "assets/iphone.webp",
-  screens: [{ at: [[38.52, 25.5], [63.56, 39.09], [38.52, 81.52]], r: 2.4, src: "shots/night-shift.png" }],
   href: "/night-shift"
 }
 ```
@@ -38,7 +36,6 @@ To use your own content, edit the `DEVICES` array in `data.js`:
 | `title` | Big name above the table |
 | `keywords` | Rows in the table (label, value) |
 | `image` | Transparent image of the device. Use a square canvas, with all devices at the same scale. |
-| `screens` | Slots over the device's screen. `at` is three corners in % of the image: top left, top right, bottom left. `r` is the corner radius. `src` is your screenshot, in the screen's own aspect ratio. `clip` hides part of a slot. |
 | `href` | Link to the device's page |
 
 Clicking the centered device calls `openDevice(id)` in `devices.js`. It is empty for now. Add your routing there.

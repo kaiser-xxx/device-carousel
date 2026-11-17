@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Device Carousel</title>
+  <meta name="description" content="A scroll-driven carousel of isometric devices in plain HTML, CSS and JavaScript." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- The carousel. devices.js fills .dv-stage and .dv-items from data.js. -->
+  <section class="dv-sec" aria-labelledby="dv-h">
+    <div class="dv-pin">
+      <div class="dv-stage"></div>
+      <ol class="dv-items"></ol>
+      <p class="dv-hint mono" aria-hidden="true">Scroll · click a device to focus · click again to open</p>
+      <div class="dv-head mono">
+        <h2 id="dv-h">Devices</h2>
+        <span class="dim dv-count"></span>
+        <a class="dim" href="https://github.com/kaiser-xxx/device-carousel">GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <script src="data.js"></script>
+  <script src="devices.js"></script>
+</body>
+</html>

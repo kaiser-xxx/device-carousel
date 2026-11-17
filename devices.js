@@ -81,7 +81,12 @@ function init() {
 
   // centre the model, turn its screen to the camera, optionally pair it with a back copy, scale it to one size
   function fitModel(v, o, d) {
-    o.traverse((m) => { if (m.isMesh) m.castShadow = true; });
+    const aniso = v.r.capabilities.getMaxAnisotropy(); // keeps textures sharp on surfaces seen at an angle
+    o.traverse((m) => {
+      if (!m.isMesh) return;
+      m.castShadow = true;
+      for (const k of ["map", "normalMap", "roughnessMap", "metalnessMap", "emissiveMap", "aoMap"]) if (m.material[k]) m.material[k].anisotropy = aniso;
+    });
     const b0 = new THREE.Box3().setFromObject(o);
     const size = b0.getSize(new THREE.Vector3());
     o.position.sub(b0.getCenter(new THREE.Vector3()));

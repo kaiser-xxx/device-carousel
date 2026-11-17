@@ -45,10 +45,14 @@ Clicking the centered device calls `openDevice(id)` in `devices.js`. It is empty
 
 ## Adding a model
 
-Compress each `.glb` before adding it:
+Compress each `.glb` before adding it. Colour textures are lossy WebP; surface maps stay lossless and the mesh is not simplified, so curved and bumpy surfaces stay smooth:
 
 ```
-npx @gltf-transform/cli optimize in.glb models/out.glb --compress meshopt --texture-compress webp --texture-size 1024
+npx @gltf-transform/cli optimize in.glb a.glb --compress false --texture-compress false --simplify false --palette false
+npx @gltf-transform/cli resize a.glb b.glb --width 1024 --height 1024
+npx @gltf-transform/cli webp b.glb c.glb --slots "{baseColorTexture,emissiveTexture}" --quality 90
+npx @gltf-transform/cli webp c.glb d.glb --slots "{normalTexture,metallicRoughnessTexture,occlusionTexture}" --lossless true
+npx @gltf-transform/cli meshopt d.glb models/out.glb --quantize-normal 12
 ```
 
 ## Files

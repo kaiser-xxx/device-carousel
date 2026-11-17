@@ -36,6 +36,15 @@ function init() {
   const box = root.querySelector(".dv-box"); // one set of corner brackets above every device, below the details
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // each device's own centre in its image (from the image's opaque pixels), so the brackets sit right on it
+  const mid = devs.map(() => [0, 0]);
+  // brackets go where the centered device is: its slot, its lift and scale, and its own centre in the image
+  function aim() {
+    const m = mid[index], k = D * 1.8 * 1.05; // image size when centered
+    root.style.setProperty("--bx", m[0] * k + "px");
+    root.style.setProperty("--by", (mob ? midY : vh * 0.04) - D * 0.05 + m[1] * k + "px");
+  }
+
   /* ---- layout ---- */
   let vw, vh, mob, D, secTop, step, midY = 0;
   function measure() {
@@ -47,7 +56,7 @@ function init() {
       midY = (top + bottom) / 2 - vh / 2;
     } else D = Math.min(vw * 0.3, vh * 0.62);
     root.style.setProperty("--dv", D + "px"); // set once per resize, not per frame
-    root.style.setProperty("--by", (mob ? midY : vh * 0.04) + "px"); // where the centered device sits
+    aim();
     secTop = sec.getBoundingClientRect().top + scrollY;
     step = Math.max(1, sec.offsetHeight - vh) / Math.max(1, n - 1);
   }
@@ -70,7 +79,7 @@ function init() {
   function sync() {
     box.classList.remove("is-on"); // brackets let go of the old device and close in on the new one once it arrives
     clearTimeout(boxTimer);
-    boxTimer = setTimeout(() => box.classList.add("is-on"), cur === index ? 0 : 450);
+    boxTimer = setTimeout(() => { aim(); box.classList.add("is-on"); }, cur === index ? 0 : 450);
     items.forEach((el, j) => el.classList.toggle("is-on", j === index)); // like CD: details follow the centered device
     devs.forEach((el, j) => { el.classList.toggle("is-on", j === index); el.tabIndex = j === index ? 0 : -1; });
   }
@@ -164,6 +173,24 @@ function init() {
     el.querySelector(".dv-open").addEventListener("click", (e) => { e.preventDefault(); openDevice(data[i].id); });
   });
 
+  devs.forEach((el, i) => {
+    const img = el.querySelector("img");
+    const fit = () => {
+      const S = 100, c = document.createElement("canvas");
+      c.width = c.height = S;
+      const g = c.getContext("2d");
+      g.drawImage(img, 0, 0, S, S);
+      const px = g.getImageData(0, 0, S, S).data;
+      let x0 = S, y0 = S, x1 = 0, y1 = 0;
+      for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) if (px[(y * S + x) * 4 + 3] > 128) {
+        x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+      }
+      if (x1 < x0) return;
+      mid[i] = [(x0 + x1 + 1) / 2 / S - 0.3889, (y0 + y1 + 1) / 2 / S - 0.3889]; // 0.3889 = centre of the device box in the image
+      if (D) aim();
+    };
+    if (img.complete) fit(); else img.addEventListener("load", fit);
+  });
   function onResize() { measure(); onScroll(); }
   addEventListener("scroll", onScroll, { passive: true });
   addEventListener("resize", onResize);

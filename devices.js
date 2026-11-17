@@ -72,6 +72,7 @@ function init() {
   let index = 0, cur = 0, from = 0, to = 0, t0 = 0, raf = 0;
   const dur = reduce ? 1 : 950;
   let intro = reduce ? 1 : 0, introAt = 0;
+  const tilt = devs.map(() => ({ x: 0, y: 0, tx: 0, ty: 0 })); // hover tilt toward the pointer, side devices only
   const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
   const out = (x) => 1 - Math.pow(1 - x, 3);
 
@@ -97,8 +98,12 @@ function init() {
       const q = place(t);
       const centered = Math.max(0, 1 - Math.abs(t)); // 1 when centered: lift a little
       const turn = i === index ? (1 - out(intro)) * 88 : 0; // the first device turns from edge-on to face you
+      const tl = tilt[i];
+      if (i === index) tl.tx = tl.ty = 0; // the centered device never tilts
+      tl.x += (tl.tx - tl.x) * 0.12; tl.y += (tl.ty - tl.y) * 0.12;
+      if (Math.abs(tl.tx - tl.x) > 0.05 || Math.abs(tl.ty - tl.y) > 0.05) busy = true;
       el.style.transform = "translate3d(" + q.x.toFixed(1) + "px," + (q.y - centered * D * 0.05).toFixed(1) + "px,0) scale(" +
-        (1 + 0.05 * centered).toFixed(4) + ") rotateY(" + turn.toFixed(2) + "deg)";
+        (1 + 0.05 * centered).toFixed(4) + ") rotateX(" + tl.y.toFixed(2) + "deg) rotateY(" + (turn + tl.x).toFixed(2) + "deg)";
       el.style.opacity = (q.o * (i === index ? Math.min(1, intro * 3 + 0.2) : 1)).toFixed(3);
       el.style.visibility = q.o <= 0 ? "hidden" : "visible";
     });
@@ -162,8 +167,19 @@ function init() {
     move(dir);
   }
 
-  // click: a side device comes to the center, the centered one opens
+  // hover (mouse only): side devices tilt toward the pointer. click: a side device comes to the center, the centered one opens
+  const hover = matchMedia("(hover: hover) and (pointer: fine)").matches && !reduce;
   devs.forEach((el, i) => {
+    if (hover) {
+      el.addEventListener("pointermove", (e) => {
+        if (i === index) return;
+        const r = el.getBoundingClientRect();
+        tilt[i].tx = ((e.clientX - r.left) / r.width - 0.5) * 10;   // up to ±5°
+        tilt[i].ty = -((e.clientY - r.top) / r.height - 0.5) * 7;   // up to ±3.5°
+        kick();
+      });
+      el.addEventListener("pointerleave", () => { tilt[i].tx = tilt[i].ty = 0; kick(); });
+    }
     el.addEventListener("click", (e) => {
       e.preventDefault();
       if (i === index) openDevice(data[i].id); else go(i);

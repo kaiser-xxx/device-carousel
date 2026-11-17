@@ -3,7 +3,7 @@
 
    One scroll gesture, swipe or arrow key moves one device along the diagonal; the centered
    device lifts. Clicking a device focuses it: it grows, the others fade back, corner
-   brackets close in and its details show top left. Clicking the focused device calls openDevice().
+   brackets close in. The centered device's details always show top left. Clicking the focused device calls openDevice().
    Esc, a click on empty space or a scroll unfocuses. Past the first or last device the page
    scrolls normally. Animates transforms and opacity only. */
 (function () {
@@ -98,7 +98,7 @@
   var out = function (x) { return 1 - Math.pow(1 - x, 3); };
 
   function sync() {
-    items.forEach(function (el, j) { el.classList.toggle("is-on", j === focused); });
+    items.forEach(function (el, j) { el.classList.toggle("is-on", j === index); }); // like CD: details follow the centered device
     devs.forEach(function (el, j) { el.classList.toggle("is-focus", j === focused); el.tabIndex = j === index ? 0 : -1; });
   }
   function unfocus() { if (focused < 0) return; focused = -1; sync(); kick(); }

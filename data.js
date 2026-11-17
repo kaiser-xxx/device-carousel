@@ -13,7 +13,7 @@ window.DEVICES = [
     name: "Pixel phone",
     title: "Pocket Studio",
     keywords: [["Role", "Lead designer"], ["Platform", "Android"], ["Year", "2025"], ["Type", "App"]],
-    image: "assets/pixel.webp",
+    image: "assets/pixel.webp?v=2",
     href: "#"
   },
   {
@@ -21,7 +21,7 @@ window.DEVICES = [
     name: "Studio Display",
     title: "Control Room",
     keywords: [["Role", "Product designer"], ["Platform", "Web"], ["Year", "2024"], ["Type", "Dashboard"]],
-    image: "assets/display.webp",
+    image: "assets/display.webp?v=2",
     href: "#"
   },
   {
@@ -29,7 +29,7 @@ window.DEVICES = [
     name: "iPhone",
     title: "Night Shift",
     keywords: [["Role", "UI designer"], ["Platform", "iOS"], ["Year", "2024"], ["Type", "App"]],
-    image: "assets/iphone.webp",
+    image: "assets/iphone.webp?v=2",
     href: "#"
   },
   {
@@ -37,7 +37,7 @@ window.DEVICES = [
     name: "MacBook Pro",
     title: "Field Notes",
     keywords: [["Role", "Design lead"], ["Platform", "Web + mobile"], ["Year", "2023"], ["Type", "SaaS"]],
-    image: "assets/macbook.webp",
+    image: "assets/macbook.webp?v=2",
     href: "#"
   },
   {
@@ -45,7 +45,7 @@ window.DEVICES = [
     name: "Galaxy S23 Ultra",
     title: "Long Weekend",
     keywords: [["Role", "Product designer"], ["Platform", "Android"], ["Year", "2022"], ["Type", "App"]],
-    image: "assets/samsung.webp",
+    image: "assets/samsung.webp?v=2",
     href: "#"
   }
 ];

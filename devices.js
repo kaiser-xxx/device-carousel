@@ -28,8 +28,7 @@ function init() {
   /* ---- render from data.js ---- */
   root.querySelector(".dv-stage").innerHTML = data.map((d) =>
     '<a class="dv" href="' + esc(d.href || "#") + '" aria-label="' + esc(d.name + ": " + d.title) + '" tabindex="-1">' +
-    '<canvas class="dv-3d" aria-hidden="true"></canvas>' +
-    '<span class="dv-box" aria-hidden="true"><i></i><i></i><i></i><i></i></span></a>').join("");
+    '<canvas class="dv-3d" aria-hidden="true"></canvas></a>').join("");
   root.querySelector(".dv-items").innerHTML = data.map((d, i) =>
     '<li class="dv-item"><h3 class="dv-title">' + esc(d.title) + '</h3><dl class="dv-rows">' +
     (d.keywords || []).map((f) => '<div><dt class="mono">' + esc(f[0]) + "</dt><dd>" + esc(f[1]) + "</dd></div>").join("") +
@@ -39,6 +38,7 @@ function init() {
 
   const devs = [...root.querySelectorAll(".dv")];
   const items = [...root.querySelectorAll(".dv-item")];
+  const box = root.querySelector(".dv-box"); // one set of corner brackets above every device, below the details
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const finePointer = matchMedia("(hover: hover) and (pointer: fine)").matches;
 
@@ -124,6 +124,7 @@ function init() {
       midY = (top + bottom) / 2 - vh / 2;
     } else D = Math.min(vw * 0.3, vh * 0.62);
     root.style.setProperty("--dv", D + "px"); // set once per resize, not per frame
+    root.style.setProperty("--by", (mob ? midY : vh * 0.04) + "px"); // where the centered device sits
     views.forEach((v) => { v.r.setSize(D * 1.8, D * 1.8, false); v.key = ""; });
     secTop = sec.getBoundingClientRect().top + scrollY;
     step = Math.max(1, sec.offsetHeight - vh) / Math.max(1, n - 1);
@@ -145,7 +146,11 @@ function init() {
   const out = (x) => 1 - Math.pow(1 - x, 3);
   const rad = THREE.MathUtils.degToRad;
 
+  let boxTimer = 0;
   function sync() {
+    box.classList.remove("is-on"); // brackets let go of the old device and close in on the new one once it arrives
+    clearTimeout(boxTimer);
+    boxTimer = setTimeout(() => box.classList.add("is-on"), cur === index ? 0 : 450);
     items.forEach((el, j) => el.classList.toggle("is-on", j === index)); // like CD: details follow the centered device
     devs.forEach((el, j) => { el.classList.toggle("is-on", j === index); el.tabIndex = j === index ? 0 : -1; });
   }

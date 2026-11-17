@@ -4,10 +4,7 @@
    name      the device, used for screen readers
    title     big name above the table when the device is centered
    keywords  rows in the table (label, value)
-   model     .glb file of the device (compressed with gltf-transform; any scale, it is fitted to size)
-   front     degrees to turn the model so its screen faces you (optional)
-   pair      true: show two copies, back behind and screen in front (optional)
-   colors    { materialName: "#hex" } to recolour parts of the model (optional)
+   image     transparent image of the device with its shadow (see README for the framing)
    href      link placeholder for the device's page
 */
 window.DEVICES = [
@@ -16,8 +13,7 @@ window.DEVICES = [
     name: "Pixel phone",
     title: "Pocket Studio",
     keywords: [["Role", "Lead designer"], ["Platform", "Android"], ["Year", "2025"], ["Type", "App"]],
-    model: "models/pixel.glb", pair: true,
-    colors: { base: "#44474a", back_panel: "#44474a", antenna: "#2b2d2f" }, // charcoal
+    image: "assets/pixel.webp",
     href: "#"
   },
   {
@@ -25,7 +21,7 @@ window.DEVICES = [
     name: "Studio Display",
     title: "Control Room",
     keywords: [["Role", "Product designer"], ["Platform", "Web"], ["Year", "2024"], ["Type", "Dashboard"]],
-    model: "models/display.glb",
+    image: "assets/display.webp",
     href: "#"
   },
   {
@@ -33,7 +29,7 @@ window.DEVICES = [
     name: "iPhone",
     title: "Night Shift",
     keywords: [["Role", "UI designer"], ["Platform", "iOS"], ["Year", "2024"], ["Type", "App"]],
-    model: "models/iphone.glb", front: 180, pair: true,
+    image: "assets/iphone.webp",
     href: "#"
   },
   {
@@ -41,7 +37,7 @@ window.DEVICES = [
     name: "MacBook Pro",
     title: "Field Notes",
     keywords: [["Role", "Design lead"], ["Platform", "Web + mobile"], ["Year", "2023"], ["Type", "SaaS"]],
-    model: "models/macbook.glb",
+    image: "assets/macbook.webp",
     href: "#"
   },
   {
@@ -49,8 +45,7 @@ window.DEVICES = [
     name: "Galaxy S23 Ultra",
     title: "Long Weekend",
     keywords: [["Role", "Product designer"], ["Platform", "Android"], ["Year", "2022"], ["Type", "App"]],
-    model: "models/samsung.glb",
-    colors: { side: "#7a7455", back_cover: "#7a7455", side_control: "#878162" }, // olive
+    image: "assets/samsung.webp",
     href: "#"
   }
 ];

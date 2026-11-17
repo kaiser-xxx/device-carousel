@@ -8,8 +8,8 @@ A scroll-driven carousel of isometric devices, built in plain HTML, CSS and Java
 - One scroll, swipe or arrow key moves one device along the line. The device in the middle lifts. Past the first or last device, the page scrolls normally if there is more content.
 - Corner brackets mark the centered device, and its title and details show top left.
 - Click a side device to bring it to the center. Click the centered device to open it.
-- The first device turns in on load.
-- On a mouse, side devices tilt toward the pointer.
+- On load the devices slide in along the path one by one.
+- On a mouse, a hovered side device nudges toward the centre.
 - Animates only transforms and opacity, so it stays smooth. Respects reduced motion.
 
 ## Use it

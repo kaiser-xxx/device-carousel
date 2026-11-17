@@ -3,8 +3,8 @@
 
    One scroll gesture, swipe or arrow key moves one device along the diagonal. The centered
    device lifts a little, gets corner brackets and its details show top left. Clicking a side
-   device brings it to the center; clicking the centered one calls openDevice(). The first
-   device turns in on load. Animates transforms and opacity only. */
+   device brings it to the center; clicking the centered one calls openDevice(). On load the
+   devices slide in along the path one by one. Animates transforms and opacity only. */
 (function () {
 const data = window.DEVICES || [];
 const sec = document.querySelector(".dv-sec");
@@ -71,8 +71,9 @@ function init() {
 
   let index = 0, cur = 0, from = 0, to = 0, t0 = 0, raf = 0;
   const dur = reduce ? 1 : 950;
-  let intro = reduce ? 1 : 0, introAt = 0;
-  const tilt = devs.map(() => ({ x: 0, y: 0, tx: 0, ty: 0 })); // hover tilt toward the pointer, side devices only
+  let intro = 0, introAt = 0;
+  const nudge = devs.map(() => ({ v: 0, to: 0 })); // hover: a side device slides a little along the path toward the centre
+  const IN = 900, GAP = 90; // intro: each device takes IN ms to slide in, GAP ms after the one before it
   const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
   const out = (x) => 1 - Math.pow(1 - x, 3);
 
@@ -89,22 +90,21 @@ function init() {
     raf = 0;
     const p = Math.min(1, (now - t0) / dur);
     cur = from + (to - from) * ease(p);
-    if (introAt && !reduce) intro = Math.min(1, (now - introAt) / 1500);
-    let busy = p < 1 || (introAt && intro < 1);
+    if (introAt && !reduce) intro = now - introAt;
+    let busy = p < 1 || (introAt && intro < IN + GAP * n);
     devs.forEach((el, i) => {
-      // during the intro the neighbours wait off-screen top right, then glide in
-      const lag = i === index ? 0 : 1 - out(Math.max(0, Math.min(1, (intro - 0.35 - Math.abs(i - index) * 0.1) / 0.55)));
-      const t = i - cur + lag * 2.2 * (i < index ? -1 : 1);
+      // intro: one by one, from the centre outward, each device slides down the path from the top right into its spot
+      const k = reduce ? 1 : introAt ? Math.max(0, Math.min(1, (intro - Math.abs(i - index) * GAP) / IN)) : 0;
+      const nd = nudge[i];
+      if (i === index) nd.to = 0;
+      nd.v += (nd.to - nd.v) * 0.15;
+      if (Math.abs(nd.to - nd.v) > 0.001) busy = true;
+      const t = i - cur + (1 - out(k)) * 1.6 + nd.v;
       const q = place(t);
       const centered = Math.max(0, 1 - Math.abs(t)); // 1 when centered: lift a little
-      const turn = i === index ? (1 - out(intro)) * 88 : 0; // the first device turns from edge-on to face you
-      const tl = tilt[i];
-      if (i === index) tl.tx = tl.ty = 0; // the centered device never tilts
-      tl.x += (tl.tx - tl.x) * 0.12; tl.y += (tl.ty - tl.y) * 0.12;
-      if (Math.abs(tl.tx - tl.x) > 0.05 || Math.abs(tl.ty - tl.y) > 0.05) busy = true;
       el.style.transform = "translate3d(" + q.x.toFixed(1) + "px," + (q.y - centered * D * 0.05).toFixed(1) + "px,0) scale(" +
-        (1 + 0.05 * centered).toFixed(4) + ") rotateX(" + tl.y.toFixed(2) + "deg) rotateY(" + (turn + tl.x).toFixed(2) + "deg)";
-      el.style.opacity = (q.o * (i === index ? Math.min(1, intro * 3 + 0.2) : 1)).toFixed(3);
+        (1 + 0.05 * centered).toFixed(4) + ")";
+      el.style.opacity = (q.o * Math.min(1, k * 2.5)).toFixed(3);
       el.style.visibility = q.o <= 0 ? "hidden" : "visible";
     });
     if (busy) raf = requestAnimationFrame(frame);
@@ -167,18 +167,12 @@ function init() {
     move(dir);
   }
 
-  // hover (mouse only): side devices tilt toward the pointer. click: a side device comes to the center, the centered one opens
+  // hover (mouse only): a side device nudges toward the centre. click: a side device comes to the center, the centered one opens
   const hover = matchMedia("(hover: hover) and (pointer: fine)").matches && !reduce;
   devs.forEach((el, i) => {
     if (hover) {
-      el.addEventListener("pointermove", (e) => {
-        if (i === index) return;
-        const r = el.getBoundingClientRect();
-        tilt[i].tx = ((e.clientX - r.left) / r.width - 0.5) * 10;   // up to ±5°
-        tilt[i].ty = -((e.clientY - r.top) / r.height - 0.5) * 7;   // up to ±3.5°
-        kick();
-      });
-      el.addEventListener("pointerleave", () => { tilt[i].tx = tilt[i].ty = 0; kick(); });
+      el.addEventListener("pointerenter", () => { if (i !== index) { nudge[i].to = Math.sign(index - i) * 0.05; kick(); } });
+      el.addEventListener("pointerleave", () => { nudge[i].to = 0; kick(); });
     }
     el.addEventListener("click", (e) => {
       e.preventDefault();
@@ -216,7 +210,7 @@ function init() {
   addEventListener("keydown", onKey);
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   measure(); sync(); onScroll();
-  requestAnimationFrame(() => requestAnimationFrame(() => { // after first paint, so the device turns in first and the details and brackets fade in after
+  requestAnimationFrame(() => requestAnimationFrame(() => { // after first paint, so the devices slide in first and the details and brackets fade in after
     root.classList.add("dv-in");
     if (!reduce) introAt = performance.now();
     kick();

@@ -2,8 +2,8 @@
    Sibling of CD Carousel (github.com/kaiser-xxx/cd-carousel), same motion and inputs.
 
    One scroll gesture, swipe or arrow key moves one device along the diagonal; the centered
-   device lifts. Clicking a device focuses it: it grows, the others fade back, a hand-drawn
-   ring draws in and its details show top left. Clicking the focused device calls openDevice().
+   device lifts. Clicking a device focuses it: it grows, the others fade back, corner
+   brackets close in and its details show top left. Clicking the focused device calls openDevice().
    Esc, a click on empty space or a scroll unfocuses. Past the first or last device the page
    scrolls normally. Animates transforms and opacity only. */
 (function () {
@@ -52,19 +52,10 @@
   var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   html.classList.add("dv-on");
 
-  // hand-drawn ring: two loose loops, an ellipse sized to the device's own bounds once its image loads
-  function loop(i, H) { // H = height of the 100-wide viewBox
-    var pts = [], turns = 1.85;
-    for (var k = 0; k <= 120; k++) {
-      var u = k / 120, a = u * turns * Math.PI * 2 + 0.7 + i;
-      var r = 44.6 + Math.sin(a * 2.3 + i) * 0.8 + Math.sin(a * 5.1 + i * 2) * 0.3 + (u - 0.5) * 2;
-      pts.push((50 + Math.cos(a) * r).toFixed(2) + " " + (H / 2 + Math.sin(a) * r * 0.985 * H / 100).toFixed(2));
-    }
-    return '<path d="M' + pts.join(" L") + '"/>';
-  }
-  devs.forEach(function (d, i) {
-    d.insertAdjacentHTML("beforeend", '<svg class="dv-ring" viewBox="0 0 100 100" aria-hidden="true">' + loop(i, 100) + "</svg>");
-    var img = d.querySelector("img"), ring = d.lastChild;
+  // corner brackets round the focused device, sized to the device's own bounds once its image loads
+  devs.forEach(function (d) {
+    d.insertAdjacentHTML("beforeend", '<span class="dv-box" aria-hidden="true"><i></i><i></i><i></i><i></i></span>');
+    var img = d.querySelector("img"), box = d.lastChild;
     function fit() {
       var c = document.createElement("canvas"), S = 100;
       c.width = c.height = S;
@@ -75,13 +66,8 @@
         if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
       }
       if (x1 < x0) return;
-      var w = x1 - x0, h = y1 - y0, p = 0.14; // loose margin round the device
-      ring.style.cssText = "left:" + (x0 - w * p) + "%;top:" + (y0 - h * p) + "%;width:" + w * (1 + 2 * p) + "%;height:" + h * (1 + 2 * p) + "%";
-      var H = 100 * h / w;
-      ring.setAttribute("viewBox", "0 0 100 " + H.toFixed(2));
-      ring.innerHTML = loop(i, H);
-      ring.style.strokeWidth = (0.55 * 75 / (w * (1 + 2 * p))).toFixed(3); // same line weight on every device
-      ring.style.setProperty("--L", Math.ceil(ring.firstChild.getTotalLength()) + 1);
+      var w = x1 - x0, h = y1 - y0, p = 0.06; // small margin round the device
+      box.style.cssText = "left:" + (x0 - w * p) + "%;top:" + (y0 - h * p) + "%;width:" + w * (1 + 2 * p) + "%;height:" + h * (1 + 2 * p) + "%";
     }
     if (img.complete) fit(); else img.addEventListener("load", fit);
   });

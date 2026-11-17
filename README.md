@@ -6,7 +6,7 @@ A scroll-driven carousel of isometric devices, built in plain HTML, CSS and Java
 
 - Devices sit on one isometric line, rising from bottom left to top right. It opens on the second device.
 - One scroll, swipe or arrow key moves one device along the line. The device in the middle lifts. Past the first or last device, the page scrolls normally if there is more content.
-- Click a device to focus it: it grows, the others fade back, a hand-drawn ring draws in and its details show top left.
+- Click a device to focus it: it grows, the others fade back, corner brackets close in and its details show top left.
 - Click the focused device again to open it. Esc, a click on empty space or a scroll unfocuses.
 - Devices tilt toward the pointer.
 - Every device has a screen slot, so you can drop your own screenshots in.

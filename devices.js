@@ -66,10 +66,13 @@
         if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
       }
       if (x1 < x0) return;
+      var w = x1 - x0;
       // same size box on every device, centered on the device itself
       box.style.left = ((x0 + x1) / 2 - 38) + "%";
       box.style.top = ((y0 + y1) / 2 - 42) + "%";
       mid[i] = [((x0 + x1) / 2 - 50) / 100, ((y0 + y1) / 2 - 50) / 100];
+      // soft contact shadow under the device's own base
+      shadows[i].style.cssText = "left:" + ((x0 + x1) / 2 - w * 0.45) + "%;top:" + (y1 - 7) + "%;width:" + w * 0.9 + "%;height:12%";
       if (D) kick();
     }
     if (img.complete) fit(); else img.addEventListener("load", fit);
@@ -129,8 +132,9 @@
         ") rotateX(" + tl.y.toFixed(2) + "deg) rotateY(" + (turn + tl.x).toFixed(2) + "deg)";
       el.style.opacity = (q.o * (i === index ? Math.min(1, intro * 3 + 0.2) : 1)).toFixed(3);
       el.style.visibility = q.o <= 0 ? "hidden" : "visible";
-      shadows[i].style.transform = "translateY(" + (up / s).toFixed(1) + "px) scale(" + (1 - 0.12 * lift).toFixed(3) + ")";
-      shadows[i].style.opacity = (0.55 + 0.45 * lift).toFixed(3);
+      // the shadow stays on the floor and spreads and fades a little as the device rises
+      shadows[i].style.transform = "translateY(" + (up / s).toFixed(1) + "px) scale(" + (1 + 0.08 * lift).toFixed(3) + ")";
+      shadows[i].style.opacity = (1 - 0.3 * lift).toFixed(3);
     });
     if (busy) raf = requestAnimationFrame(frame);
   }

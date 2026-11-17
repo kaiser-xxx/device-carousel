@@ -7,6 +7,7 @@
    model     .glb file of the device (compressed with gltf-transform; any scale, it is fitted to size)
    front     degrees to turn the model so its screen faces you (optional)
    pair      true: show two copies, back behind and screen in front (optional)
+   colors    { materialName: "#hex" } to recolour parts of the model (optional)
    href      link placeholder for the device's page
 */
 window.DEVICES = [
@@ -16,6 +17,7 @@ window.DEVICES = [
     title: "Pocket Studio",
     keywords: [["Role", "Lead designer"], ["Platform", "Android"], ["Year", "2025"], ["Type", "App"]],
     model: "models/pixel.glb", pair: true,
+    colors: { base: "#44474a", back_panel: "#44474a", antenna: "#2b2d2f" }, // charcoal
     href: "#"
   },
   {
@@ -48,6 +50,7 @@ window.DEVICES = [
     title: "Long Weekend",
     keywords: [["Role", "Product designer"], ["Platform", "Android"], ["Year", "2022"], ["Type", "App"]],
     model: "models/samsung.glb",
+    colors: { side: "#7a7455", back_cover: "#7a7455", side_control: "#878162" }, // olive
     href: "#"
   }
 ];

@@ -82,6 +82,7 @@ function init() {
     o.traverse((m) => {
       if (!m.isMesh) return;
       m.castShadow = true;
+      if (d.colors && d.colors[m.material.name]) m.material.color.set(d.colors[m.material.name]);
       for (const k of ["map", "normalMap", "roughnessMap", "metalnessMap", "emissiveMap", "aoMap"]) if (m.material[k]) m.material[k].anisotropy = aniso;
     });
     const b0 = new THREE.Box3().setFromObject(o);

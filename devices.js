@@ -53,7 +53,7 @@
   var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   html.classList.add("dv-on");
 
-  // corner brackets round the focused device, sized to the device's own bounds once its image loads
+  // corner brackets round the focused device: one size for all, centered on the device once its image loads
   devs.forEach(function (d) {
     d.insertAdjacentHTML("beforeend", '<span class="dv-box" aria-hidden="true"><i></i><i></i><i></i><i></i></span>');
     var img = d.querySelector("img"), box = d.lastChild;
@@ -67,8 +67,9 @@
         if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
       }
       if (x1 < x0) return;
-      var w = x1 - x0, h = y1 - y0, p = 0.06; // small margin round the device
-      box.style.cssText = "left:" + (x0 - w * p) + "%;top:" + (y0 - h * p) + "%;width:" + w * (1 + 2 * p) + "%;height:" + h * (1 + 2 * p) + "%";
+      // same size box on every device, centered on the device itself
+      box.style.left = ((x0 + x1) / 2 - 38) + "%";
+      box.style.top = ((y0 + y1) / 2 - 42) + "%";
     }
     if (img.complete) fit(); else img.addEventListener("load", fit);
   });

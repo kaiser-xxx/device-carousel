@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- The carousel. devices.js fills .dv-stage and .dv-items from data.js. -->
+  <!-- devices.js fills .dv-stage and .dv-items from data.js -->
   <section class="dv-sec" aria-labelledby="dv-h">
     <div class="dv-pin">
       <div class="dv-stage"></div>
@@ -26,8 +26,7 @@
     </div>
   </section>
 
-  <script type="importmap">{ "imports": { "three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/addons/" } }</script>
-  <link rel="modulepreload" href="vendor/three/three.module.min.js" />
+  <link rel="modulepreload" href="vendor/three.js" />
   <link rel="preload" href="models/pixel.glb" as="fetch" crossorigin />
   <script src="data.js"></script>
   <script type="module" src="devices.js"></script>

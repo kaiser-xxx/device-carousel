@@ -45,10 +45,10 @@ Clicking the centered device calls `openDevice(id)` in `devices.js`. It is empty
 
 ## Adding a model
 
-Compress each `.glb` before adding it. Colour textures are lossy WebP; surface maps stay lossless and the mesh is not simplified, so curved and bumpy surfaces stay smooth:
+Compress each `.glb` before adding it. Colour textures are lossy WebP; surface maps stay lossless and the mesh is only simplified where nothing visible changes, so curved and bumpy surfaces stay smooth:
 
 ```
-npx @gltf-transform/cli optimize in.glb a.glb --compress false --texture-compress false --simplify false --palette false
+npx @gltf-transform/cli optimize in.glb a.glb --compress false --texture-compress false --simplify-error 0.0002 --simplify-lock-border true --palette false
 npx @gltf-transform/cli resize a.glb b.glb --width 1024 --height 1024
 npx @gltf-transform/cli webp b.glb c.glb --slots "{baseColorTexture,emissiveTexture}" --quality 90
 npx @gltf-transform/cli webp c.glb d.glb --slots "{normalTexture,metallicRoughnessTexture,occlusionTexture}" --lossless true
@@ -58,12 +58,25 @@ npx @gltf-transform/cli meshopt d.glb models/out.glb --quantize-normal 12
 ## Files
 
 ```
-index.html     the page
-style.css      styles
-data.js        the devices
-devices.js     layout, motion and the 3D scenes
-models/        compressed .glb models
-vendor/three/  three.js r170 (MIT)
+index.html        the page
+style.css         styles
+data.js           the devices
+devices.js        layout, motion and the 3D scenes
+models/           compressed .glb models
+vendor/three.js   three.js r170, only the parts devices.js uses (MIT, see three.LICENSE)
+```
+
+`vendor/three.js` is built once with esbuild from `three@0.170`. If `devices.js` starts using another part of three.js, add it to the export list and rebuild:
+
+```
+export { WebGLRenderer, ACESFilmicToneMapping, VSMShadowMap, Scene, PMREMGenerator, DirectionalLight, Mesh, PlaneGeometry, ShadowMaterial, OrthographicCamera, Group, Box3, Vector3, MathUtils } from "three";
+export { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+export { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
+export { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+```
+
+```
+npx esbuild entry.js --bundle --format=esm --minify --outfile=vendor/three.js
 ```
 
 ## License

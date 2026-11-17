@@ -47,7 +47,7 @@ window.DEVICES = [
     name: "Galaxy S23 Ultra",
     title: "Long Weekend",
     keywords: [["Role", "Product designer"], ["Platform", "Android"], ["Year", "2022"], ["Type", "App"]],
-    model: "models/samsung.glb", front: 180,
+    model: "models/samsung.glb",
     href: "#"
   }
 ];

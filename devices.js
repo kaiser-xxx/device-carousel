@@ -7,10 +7,7 @@
    On a mouse, devices tilt toward the pointer. The first device spins in on load.
    Each device is its own small three.js canvas and only redraws while its model moves;
    moving along the line is plain CSS transforms. */
-import * as THREE from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import * as THREE from "./vendor/three.js"; // three.js r170, only the parts used here (see README)
 
 const data = window.DEVICES || [];
 const sec = document.querySelector(".dv-sec");
@@ -45,7 +42,7 @@ function init() {
   /* ---- one small 3D scene per device, all lit the same ---- */
   // the canvas reaches 20% past the device box up and left, 60% down and right, so the long shadow is never cut
   const U = 1.5; // world units per device box
-  const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+  const loader = new THREE.GLTFLoader().setMeshoptDecoder(THREE.MeshoptDecoder);
   const views = devs.map((el, i) => {
     const r = new THREE.WebGLRenderer({ canvas: el.querySelector("canvas"), antialias: true, alpha: true });
     r.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -54,7 +51,7 @@ function init() {
     r.shadowMap.type = THREE.VSMShadowMap; // soft, blurred shadow
     const scene = new THREE.Scene();
     const pm = new THREE.PMREMGenerator(r);
-    scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.environment = pm.fromScene(new THREE.RoomEnvironment(), 0.04).texture;
     pm.dispose();
     const sun = new THREE.DirectionalLight(0xffffff, 1.2);
     sun.position.set(-2.9, 6, 5.2); // 45° above the floor
@@ -75,7 +72,7 @@ function init() {
     const pivot = new THREE.Group(); // spins, tilts and floats; the floor stays put
     scene.add(pivot);
     const v = { r, scene, cam, pivot, floor, ready: false, key: "" };
-    loader.loadAsync(data[i].model).then((g) => { fitModel(v, g.scene, data[i]); v.ready = true; v.key = ""; startIntro(); kick(); });
+    loader.loadAsync(data[i].model).then((g) => { fitModel(v, g.scene, data[i]); v.ready = true; startIntro(); kick(); });
     return v;
   });
 

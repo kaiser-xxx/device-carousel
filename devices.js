@@ -52,7 +52,8 @@
   html.classList.add("dv-on");
 
   // corner brackets round the centered device: one size for all, centered on the device once its image loads
-  devs.forEach(function (d) {
+  var mid = devs.map(function () { return [0, 0]; }); // device's own center vs its image center, in units of D
+  devs.forEach(function (d, i) {
     d.insertAdjacentHTML("beforeend", '<span class="dv-box" aria-hidden="true"><i></i><i></i><i></i><i></i></span>');
     var img = d.querySelector("img"), box = d.lastChild;
     function fit() {
@@ -68,14 +69,21 @@
       // same size box on every device, centered on the device itself
       box.style.left = ((x0 + x1) / 2 - 38) + "%";
       box.style.top = ((y0 + y1) / 2 - 42) + "%";
+      mid[i] = [((x0 + x1) / 2 - 50) / 100, ((y0 + y1) / 2 - 50) / 100];
+      if (D) kick();
     }
     if (img.complete) fit(); else img.addEventListener("load", fit);
   });
 
-  var vw, vh, mob, D, secTop, step;
+  var vw, vh, mob, D, secTop, step, midY = 0;
   function measure() {
     vw = innerWidth; vh = root.offsetHeight; mob = vw < 761;
-    D = mob ? Math.min(vw * 0.92, vh * 0.55) : Math.min(vw * 0.3, vh * 0.62);
+    if (mob) { // phone: the device gets the space below the details, with room to breathe
+      var top = Math.max.apply(null, items.map(function (el) { return el.offsetTop + el.offsetHeight; })) + 48;
+      var bottom = vh - 72;
+      D = Math.min(vw * 0.92, bottom - top);
+      midY = (top + bottom) / 2 - vh / 2;
+    } else D = Math.min(vw * 0.3, vh * 0.62);
     root.style.setProperty("--dv", D + "px"); // set once per resize, not per frame
     secTop = sec.getBoundingClientRect().top + scrollY;
     step = Math.max(1, sec.offsetHeight - vh) / Math.max(1, n - 1);
@@ -84,7 +92,7 @@
   // one straight isometric line: next device up and right, previous down and left, all the same size
   function place(t) {
     var a = Math.abs(t), x, y, fade = mob ? 1.7 : 2.6;
-    if (mob) { x = t * vw * 0.96; y = vh * 0.06 - t * vh * 0.05; }
+    if (mob) { x = t * vw * 0.96; y = midY - t * vh * 0.05; }
     else { x = t * D * 0.82; y = vh * 0.04 - t * D * 0.57; }
     return { x: x, y: y, o: a > fade ? Math.max(0, 1 - (a - fade) / 0.5) : 1 };
   }
@@ -117,7 +125,7 @@
       var up = lift * D * 0.05;
       var s = 1 + 0.05 * lift;
       var turn = i === index ? (1 - out(intro)) * 88 : 0; // the first device turns from edge-on to face you
-      el.style.transform = "translate3d(" + q.x.toFixed(1) + "px," + (q.y - up).toFixed(1) + "px,0) scale(" + s.toFixed(4) +
+      el.style.transform = "translate3d(" + (q.x - mid[i][0] * D * s).toFixed(1) + "px," + (q.y - up - mid[i][1] * D * s).toFixed(1) + "px,0) scale(" + s.toFixed(4) +
         ") rotateX(" + tl.y.toFixed(2) + "deg) rotateY(" + (turn + tl.x).toFixed(2) + "deg)";
       el.style.opacity = (q.o * (i === index ? Math.min(1, intro * 3 + 0.2) : 1)).toFixed(3);
       el.style.visibility = q.o <= 0 ? "hidden" : "visible";
@@ -215,4 +223,5 @@
   addEventListener("keydown", onKey);
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   measure(); sync(); go(START); onScroll();
+  if (document.fonts) document.fonts.ready.then(onResize); // the details block grows once the fonts land
 })();

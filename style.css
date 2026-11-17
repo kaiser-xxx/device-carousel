@@ -27,7 +27,7 @@ a { color: inherit; text-decoration: none; }
   will-change: transform; pointer-events: auto; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
 }
 .dv:focus-visible { outline: none; }
-.dv img { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.dv-3d { position: absolute; left: -20%; top: -20%; width: 180%; height: 180%; pointer-events: none; } /* extra room down-right for the shadow */
 
 /* corner brackets round the centered device: same size for every device, JS centers it on the device */
 .dv-box { position: absolute; left: 12%; top: 8%; width: 76%; height: 84%; pointer-events: none; }

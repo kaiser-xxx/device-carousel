@@ -32,7 +32,7 @@
   }
   root.querySelector(".dv-stage").innerHTML = data.map(function (d) {
     return '<a class="dv" href="' + esc(d.href || "#") + '" aria-label="' + esc(d.name + ": " + d.title) + '" tabindex="-1">' +
-      '<span class="dv-shadow"></span><img src="' + esc(d.image) + '" alt="" draggable="false">' +
+      '<img src="' + esc(d.image) + '" alt="" draggable="false">' +
       (d.screens || []).map(screen).join("") + "</a>";
   }).join("");
   root.querySelector(".dv-items").innerHTML = data.map(function (d, i) {
@@ -46,7 +46,6 @@
 
   var devs = [].slice.call(root.querySelectorAll(".dv"));
   var items = [].slice.call(root.querySelectorAll(".dv-item"));
-  var shadows = devs.map(function (el) { return el.querySelector(".dv-shadow"); });
   var html = document.documentElement;
   var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   html.classList.add("dv-on");
@@ -71,8 +70,6 @@
       box.style.left = ((x0 + x1) / 2 - 38) + "%";
       box.style.top = ((y0 + y1) / 2 - 42) + "%";
       mid[i] = [((x0 + x1) / 2 - 50) / 100, ((y0 + y1) / 2 - 50) / 100];
-      // soft contact shadow under the device's own base
-      shadows[i].style.cssText = "left:" + ((x0 + x1) / 2 - w * 0.45) + "%;top:" + (y1 - 7) + "%;width:" + w * 0.9 + "%;height:12%";
       if (D) kick();
     }
     if (img.complete) fit(); else img.addEventListener("load", fit);
@@ -125,16 +122,13 @@
       tl.x += (tl.tx - tl.x) * 0.12; tl.y += (tl.ty - tl.y) * 0.12;
       if (Math.abs(tl.tx - tl.x) > 0.05 || Math.abs(tl.ty - tl.y) > 0.05) busy = true;
       var lift = Math.max(0, 1 - Math.abs(t)); // 1 when centered
-      var up = lift * D * 0.05;
+      var up = lift * D * 0.05; // the centered device lifts a little
       var s = 1 + 0.05 * lift;
       var turn = i === index ? (1 - out(intro)) * 88 : 0; // the first device turns from edge-on to face you
       el.style.transform = "translate3d(" + (q.x - mid[i][0] * D * s).toFixed(1) + "px," + (q.y - up - mid[i][1] * D * s).toFixed(1) + "px,0) scale(" + s.toFixed(4) +
         ") rotateX(" + tl.y.toFixed(2) + "deg) rotateY(" + (turn + tl.x).toFixed(2) + "deg)";
       el.style.opacity = (q.o * (i === index ? Math.min(1, intro * 3 + 0.2) : 1)).toFixed(3);
       el.style.visibility = q.o <= 0 ? "hidden" : "visible";
-      // the shadow stays on the floor and spreads and fades a little as the device rises
-      shadows[i].style.transform = "translateY(" + (up / s).toFixed(1) + "px) scale(" + (1 + 0.08 * lift).toFixed(3) + ")";
-      shadows[i].style.opacity = (1 - 0.3 * lift).toFixed(3);
     });
     if (busy) raf = requestAnimationFrame(frame);
   }

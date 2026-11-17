@@ -2,8 +2,8 @@
    Sibling of CD Carousel (github.com/kaiser-xxx/cd-carousel), same motion and inputs.
 
    One scroll gesture, swipe or arrow key moves one device along the diagonal; the centered
-   device lifts. Clicking a device focuses it: it grows, the others fade back, corner
-   brackets close in. The centered device's details always show top left. Clicking the focused device calls openDevice().
+   device lifts. Corner brackets mark the centered device.
+   Clicking a device focuses it: it grows and the others fade back. The centered device's details always show top left. Clicking the focused device calls openDevice().
    While focused, scrolling moves the focus too.
    Esc or a click on empty space unfocuses. Past the first or last device the page
    scrolls normally. Animates transforms and opacity only. */
@@ -53,7 +53,7 @@
   var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   html.classList.add("dv-on");
 
-  // corner brackets round the focused device: one size for all, centered on the device once its image loads
+  // corner brackets round the centered device: one size for all, centered on the device once its image loads
   devs.forEach(function (d) {
     d.insertAdjacentHTML("beforeend", '<span class="dv-box" aria-hidden="true"><i></i><i></i><i></i><i></i></span>');
     var img = d.querySelector("img"), box = d.lastChild;
@@ -101,7 +101,7 @@
 
   function sync() {
     items.forEach(function (el, j) { el.classList.toggle("is-on", j === index); }); // like CD: details follow the centered device
-    devs.forEach(function (el, j) { el.classList.toggle("is-focus", j === focused); el.tabIndex = j === index ? 0 : -1; });
+    devs.forEach(function (el, j) { el.classList.toggle("is-focus", j === focused); el.classList.toggle("is-on", j === index); el.tabIndex = j === index ? 0 : -1; });
   }
   function unfocus() { if (focused < 0) return; focused = -1; sync(); kick(); }
 

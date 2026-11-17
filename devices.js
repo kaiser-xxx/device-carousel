@@ -11,7 +11,7 @@
   var root = sec && sec.querySelector(".dv-pin");
   if (!root || !data.length) return;
   var n = data.length;
-  var START = Math.min(1, n - 1); // the carousel opens on the 2nd device
+  var START = 0; // the carousel opens on the first device
   var pad = function (k) { return String(k).padStart(2, "0"); };
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
 
@@ -220,6 +220,9 @@
   addEventListener("touchmove", onTouchMove, { passive: false });
   addEventListener("keydown", onKey);
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
-  measure(); sync(); go(START); onScroll();
-  if (document.fonts) document.fonts.ready.then(onResize); // the details block grows once the fonts land
+  measure(); sync(); go(START);
+  requestAnimationFrame(function () { requestAnimationFrame(function () { // after first paint, so the details and brackets fade in
+    onScroll();
+    if (document.fonts) document.fonts.ready.then(onResize); // the details block grows once the fonts land
+  }); });
 })();

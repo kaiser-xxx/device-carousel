@@ -1,12 +1,10 @@
 /* Device Carousel: a scroll-driven carousel of isometric devices.
    Sibling of CD Carousel (github.com/kaiser-xxx/cd-carousel), same motion and inputs.
 
-   One scroll gesture, swipe or arrow key moves one device along the diagonal; the centered
-   device lifts. Corner brackets mark the centered device.
-   Clicking a device focuses it: it grows and the others fade back. The centered device's details always show top left. Clicking the focused device calls openDevice().
-   While focused, scrolling moves the focus too.
-   Esc or a click on empty space unfocuses. Past the first or last device the page
-   scrolls normally. Animates transforms and opacity only. */
+   One scroll gesture, swipe or arrow key moves one device along the diagonal. The centered
+   device lifts, gets corner brackets and its details show top left. Clicking a side device
+   brings it to the center; clicking the centered one calls openDevice(). Past the first or
+   last device the page scrolls normally. Animates transforms and opacity only. */
 (function () {
   var data = window.DEVICES || [];
   var sec = document.querySelector(".dv-sec");
@@ -91,34 +89,24 @@
     return { x: x, y: y, o: a > fade ? Math.max(0, 1 - (a - fade) / 0.5) : 1 };
   }
 
-  var index = START, cur = START, from = START, to = START, t0 = 0, dur = reduce ? 1 : 950, raf = 0, last = 0;
+  var index = START, cur = START, from = START, to = START, t0 = 0, dur = reduce ? 1 : 950, raf = 0;
   var intro = reduce ? 1 : 0, introAt = 0;
-  var focused = -1, fAll = 0, fOne = devs.map(function () { return 0; });
-  var ZOOM = mob ? 0.12 : 0.32;
   var tilt = devs.map(function () { return { x: 0, y: 0, tx: 0, ty: 0 }; });
   var ease = function (x) { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
   var out = function (x) { return 1 - Math.pow(1 - x, 3); };
 
   function sync() {
     items.forEach(function (el, j) { el.classList.toggle("is-on", j === index); }); // like CD: details follow the centered device
-    devs.forEach(function (el, j) { el.classList.toggle("is-focus", j === focused); el.classList.toggle("is-on", j === index); el.tabIndex = j === index ? 0 : -1; });
+    devs.forEach(function (el, j) { el.classList.toggle("is-on", j === index); el.tabIndex = j === index ? 0 : -1; });
   }
-  function unfocus() { if (focused < 0) return; focused = -1; sync(); kick(); }
 
   function frame(now) {
     raf = 0;
-    var dt = last ? Math.min(64, now - last) : 0;
-    last = now;
-    var k = reduce ? 1 : 1 - Math.pow(0.86, dt / 16.7); // frame-rate independent glide
     var p = Math.min(1, (now - t0) / dur);
     cur = from + (to - from) * ease(p);
     if (introAt) intro = Math.min(1, (now - introAt) / 1500);
     var busy = p < 1 || (introAt && intro < 1);
-    fAll += ((focused < 0 ? 0 : 1) - fAll) * k;
-    if (Math.abs((focused < 0 ? 0 : 1) - fAll) > 0.002) busy = true;
     devs.forEach(function (el, i) {
-      var f = fOne[i] += ((i === focused ? 1 : 0) - fOne[i]) * k;
-      if (Math.abs((i === focused ? 1 : 0) - f) > 0.002) busy = true;
       // during the intro the neighbours wait off-screen top right, then glide in
       var lag = i === index ? 0 : 1 - out(Math.max(0, Math.min(1, (intro - 0.35 - Math.abs(i - index) * 0.1) / 0.55)));
       var t = i - cur + lag * 2.2 * (i < index ? -1 : 1);
@@ -127,16 +115,16 @@
       if (Math.abs(tl.tx - tl.x) > 0.05 || Math.abs(tl.ty - tl.y) > 0.05) busy = true;
       var lift = Math.max(0, 1 - Math.abs(t)); // 1 when centered
       var up = lift * D * 0.05;
-      var s = (1 + 0.05 * lift) * (1 + ZOOM * f) * (1 - 0.06 * Math.max(0, fAll - f));
+      var s = 1 + 0.05 * lift;
       var turn = i === index ? (1 - out(intro)) * 88 : 0; // the first device turns from edge-on to face you
       el.style.transform = "translate3d(" + q.x.toFixed(1) + "px," + (q.y - up).toFixed(1) + "px,0) scale(" + s.toFixed(4) +
         ") rotateX(" + tl.y.toFixed(2) + "deg) rotateY(" + (turn + tl.x).toFixed(2) + "deg)";
-      el.style.opacity = (q.o * (i === index ? Math.min(1, intro * 3 + 0.2) : 1) * (1 - 0.85 * Math.max(0, fAll - f))).toFixed(3);
+      el.style.opacity = (q.o * (i === index ? Math.min(1, intro * 3 + 0.2) : 1)).toFixed(3);
       el.style.visibility = q.o <= 0 ? "hidden" : "visible";
       shadows[i].style.transform = "translateY(" + (up / s).toFixed(1) + "px) scale(" + (1 - 0.12 * lift).toFixed(3) + ")";
       shadows[i].style.opacity = (0.55 + 0.45 * lift).toFixed(3);
     });
-    if (busy) raf = requestAnimationFrame(frame); else last = 0;
+    if (busy) raf = requestAnimationFrame(frame);
   }
   function kick() { if (!raf) raf = requestAnimationFrame(frame); }
 
@@ -149,7 +137,6 @@
     var k = Math.max(0, Math.min(n - 1, Math.round(rel / step)));
     if (k !== index) {
       index = k; from = cur; to = k; t0 = performance.now();
-      if (focused >= 0) focused = k; // while focused, scrolling carries the focus along, same as clicking
       sync();
     }
     kick();
@@ -195,14 +182,13 @@
   }
   var KEYS = { ArrowDown: 1, PageDown: 1, ArrowRight: 1, ArrowUp: -1, PageUp: -1, ArrowLeft: -1 };
   function onKey(e) {
-    if (e.key === "Escape") return unfocus();
     var dir = KEYS[e.key];
     if (!dir || /input|textarea|select/i.test(e.target.tagName) || !inside(dir)) return;
     e.preventDefault();
     move(dir);
   }
 
-  // hover tilt + click: first click focuses, second click opens
+  // hover tilt + click: a side device comes to the center, the centered one opens
   devs.forEach(function (el, i) {
     el.addEventListener("pointermove", function (e) {
       var r = el.getBoundingClientRect();
@@ -213,16 +199,12 @@
     el.addEventListener("pointerleave", function () { tilt[i].tx = tilt[i].ty = 0; kick(); });
     el.addEventListener("click", function (e) {
       e.preventDefault();
-      if (focused === i) return openDevice(data[i].id);
-      focused = i;
-      if (i !== index) go(i);
-      sync(); kick();
+      if (i === index) openDevice(data[i].id); else go(i);
     });
   });
   items.forEach(function (el, i) {
     el.querySelector(".dv-open").addEventListener("click", function (e) { e.preventDefault(); openDevice(data[i].id); });
   });
-  root.addEventListener("click", function (e) { if (!e.target.closest(".dv, .dv-item, .dv-head")) unfocus(); });
 
   function onResize() { measure(); onScroll(); }
   addEventListener("scroll", onScroll, { passive: true });

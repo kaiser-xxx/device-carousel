@@ -6,9 +6,8 @@ A scroll-driven carousel of isometric devices, built in plain HTML, CSS and Java
 
 - Devices sit on one isometric line, rising from bottom left to top right. It opens on the second device.
 - One scroll, swipe or arrow key moves one device along the line. The device in the middle lifts. Past the first or last device, the page scrolls normally if there is more content.
-- Click a device to focus it: it grows and the others fade back.
 - Corner brackets mark the centered device, and its title and details show top left.
-- Click the focused device again to open it. While focused, scrolling moves the focus to the next device. Esc or a click on empty space unfocuses.
+- Click a side device to bring it to the center. Click the centered device to open it.
 - Devices tilt toward the pointer.
 - Every device has a screen slot, so you can drop your own screenshots in.
 - Animates only transforms and opacity, so it stays smooth. Respects reduced motion.
@@ -34,7 +33,7 @@ To use your own content, edit the `DEVICES` array in `data.js`:
 
 | Field | What it shows |
 | --- | --- |
-| `id` | Passed to `openDevice(id)` when the focused device is clicked |
+| `id` | Passed to `openDevice(id)` when the centered device is clicked |
 | `name` | The device, read out to screen readers |
 | `title` | Big name above the table |
 | `keywords` | Rows in the table (label, value) |
@@ -42,7 +41,7 @@ To use your own content, edit the `DEVICES` array in `data.js`:
 | `screens` | Slots over the device's screen. `at` is three corners in % of the image: top left, top right, bottom left. `r` is the corner radius. `src` is your screenshot, in the screen's own aspect ratio. `clip` hides part of a slot. |
 | `href` | Link to the device's page |
 
-Clicking the focused device calls `openDevice(id)` in `devices.js`. It is empty for now. Add your routing there.
+Clicking the centered device calls `openDevice(id)` in `devices.js`. It is empty for now. Add your routing there.
 
 ## Files
 

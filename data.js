@@ -1,8 +1,8 @@
 /* Your devices, in order along the line (bottom left to top right).
 
-   id        passed to openDevice(id) when the focused device is clicked
+   id        passed to openDevice(id) when the centered device is clicked
    name      the device, used for screen readers
-   title     big name above the table when the device is focused
+   title     big name above the table when the device is centered
    keywords  rows in the table (label, value)
    image     transparent image of the device, square canvas, all at the same scale
    screens   slots laid over the device's screen:

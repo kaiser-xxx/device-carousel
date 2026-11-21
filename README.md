@@ -22,7 +22,7 @@ To use your own content, edit the `DEVICES` array in `data.js`:
   name: "iPhone",
   title: "Night Shift",
   keywords: [["Role", "UI designer"], ["Platform", "iOS"], ["Year", "2024"], ["Type", "App"]],
-  image: "assets/iphone.webp",
+  image: "assets/iphone-front.webp",
   href: "/night-shift"
 }
 ```
@@ -33,7 +33,8 @@ To use your own content, edit the `DEVICES` array in `data.js`:
 | `name` | The device, read out to screen readers |
 | `title` | Big name above the table |
 | `keywords` | Rows in the table (label, value) |
-| `image` | Transparent image of the device with its shadow, square. The device sits in the box from 11% to 67% of the image on both axes; the rest is room for the shadow. |
+| `image` | Front view of the device with its shadow, centred in a transparent square. The device is 1/2.2 of the image; the rest is room for the shadow. |
+| `wip` | `true` greys it out and stops it opening (optional) |
 | `href` | Link to the device's page |
 
 Clicking the centered device calls `openDevice(id)` in `devices.js`. It is empty for now. Add your routing there.

@@ -22,11 +22,11 @@ a { color: inherit; text-decoration: none; }
 .dv-pin { position: sticky; top: 0; height: 100svh; min-height: 560px; overflow: hidden; }
 .dv-stage { position: absolute; inset: 0; pointer-events: none; }
 
-/* the wheel: its hub sits R below the frame; each device rotates about the hub to (its place - k) × 30°,
-   so the one at 0° is in the frame and its neighbours are off screen */
+/* the wheel: its hub sits R below the frame; each device rotates about the hub to (its place - k) × step,
+   so the one at 0° is in the frame and its neighbours peek in at the sides */
 .dv {
-  position: absolute; left: 50%; top: calc(50% + var(--cy, 0px)); width: var(--dv, 420px); height: var(--dv, 420px); margin: calc(var(--dv, 420px) / -2) 0 0 calc(var(--dv, 420px) / -2);
-  transform-origin: 50% calc(50% + var(--r, 2000px)); transform: rotate(calc((var(--i) - var(--k, 0)) * 30deg));
+  position: absolute; left: calc(50% + var(--cx, 0px)); top: calc(50% + var(--cy, 0px)); width: var(--dv, 420px); height: var(--dv, 420px); margin: calc(var(--dv, 420px) / -2) 0 0 calc(var(--dv, 420px) / -2);
+  transform-origin: 50% calc(50% + var(--r, 2000px)); transform: rotate(calc((var(--i) - var(--k, 0)) * var(--step, 32deg)));
   transition: transform .9s cubic-bezier(.65, 0, .35, 1), opacity .6s;
   will-change: transform; pointer-events: auto; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
 }
@@ -37,7 +37,7 @@ a { color: inherit; text-decoration: none; }
 .dv-pin:not(.dv-in) .dv { opacity: 0; }
 
 /* corner brackets: the frame, above the devices and below the details */
-.dv-box { position: absolute; left: 50%; top: calc(50% + var(--cy, 0px)); z-index: 1; width: calc(var(--dv, 420px) * 1.2); height: calc(var(--dv, 420px) * 1.12); translate: -50% -50%; pointer-events: none; }
+.dv-box { position: absolute; left: calc(50% + var(--cx, 0px)); top: calc(50% + var(--cy, 0px)); z-index: 1; width: calc(var(--dv, 420px) * 1.2); height: calc(var(--dv, 420px) * 1.12); translate: -50% -50%; pointer-events: none; }
 .dv-box i { position: absolute; width: 16px; height: 16px; border: 0 solid var(--ink); opacity: 0; translate: var(--o); transition: opacity .25s, translate .35s var(--ease); }
 .dv-box i:nth-child(1) { top: 0; left: 0; border-width: 1.5px 0 0 1.5px; --o: -10px -10px; }
 .dv-box i:nth-child(2) { top: 0; right: 0; border-width: 1.5px 1.5px 0 0; --o: 10px -10px; }
@@ -48,8 +48,8 @@ a { color: inherit; text-decoration: none; }
 
 /* table (top left), hint and header (bottom) */
 .dv-items { margin: 0; padding: 0; list-style: none; }
-.dv-item { position: absolute; top: 48px; left: var(--gut); z-index: 2; width: min(330px, 34vw); }
-.dv-title { margin: 0 0 10px; font-size: clamp(30px, 2.8vw, 48px); line-height: 1; font-weight: 500; letter-spacing: -.02em; text-transform: uppercase; }
+.dv-item { position: absolute; top: 56px; left: var(--gut); z-index: 2; width: min(400px, 30vw); }
+.dv-title { margin: 0 0 14px; font-size: clamp(34px, 4vw, 72px); line-height: 1; font-weight: 500; letter-spacing: -.02em; text-transform: uppercase; }
 .dv-rows { margin: 0; }
 .dv-rows div { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 7px 0 6px; border-top: 1px solid rgba(26, 26, 26, .55); }
 .dv-rows dt { font-size: 10px; letter-spacing: .14em; }

@@ -1,6 +1,6 @@
 /* Device Carousel, wheel version.
 
-   The devices sit on a big wheel; only the one in the brackets is on screen. One scroll gesture,
+   The devices sit on a big wheel. The one in the brackets is framed; its neighbours peek in at the sides. One scroll gesture,
    swipe or arrow key turns the wheel one step and the next device rolls into the frame. Its details
    show top left. Clicking a side device turns it into the frame; clicking the framed one calls
    openDevice(). Each device turns with a CSS transition on its own transform, so the motion runs
@@ -35,23 +35,26 @@ function init() {
   const box = root.querySelector(".dv-box");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ---- layout: device size D, wheel radius R, frame centre ---- */
+  /* ---- layout: device size D, frame centre (cx, cy), wheel radius R ---- */
+  const STEP = 32; // degrees between devices on the wheel
   let D, secTop, step;
   function measure() {
     const vw = innerWidth, vh = root.offsetHeight;
-    let cy;
-    if (vw < 761) { // phone: the frame gets the space below the details, with room to breathe
+    let cx, cy, gap; // gap = how far a neighbour sits sideways from the frame
+    if (vw < 761) { // phone: the frame sits below the details; the neighbours peek in at both edges
       const top = Math.max(...items.map((el) => el.offsetTop + el.offsetHeight)) + 40;
       const bottom = vh - 64;
       D = Math.min(vw * 0.72, (bottom - top) * 0.82);
-      cy = (top + bottom) / 2 - vh / 2;
-    } else {
-      D = Math.min(vw * 0.32, vh * 0.5);
-      cy = vh * 0.04;
+      cx = 0; cy = (top + bottom) / 2 - vh / 2; gap = vw * 0.6;
+    } else { // desktop: details left, a big frame right; the previous device shows bottom left, the next peeks in at the right edge
+      D = Math.min(vw * 0.42, vh * 0.62);
+      cx = vw * 0.1; cy = vh * 0.05; gap = vw * 0.45;
     }
+    root.style.setProperty("--step", STEP + "deg");
     root.style.setProperty("--dv", D + "px");
+    root.style.setProperty("--cx", cx + "px");
     root.style.setProperty("--cy", cy + "px");
-    root.style.setProperty("--r", vw + D * 3 + "px"); // big enough that the neighbours (30° away) sit fully off screen
+    root.style.setProperty("--r", gap / Math.sin(STEP * Math.PI / 180) + "px"); // the radius that puts a neighbour exactly gap sideways
     secTop = sec.getBoundingClientRect().top + scrollY;
     step = Math.max(1, sec.offsetHeight - vh) / Math.max(1, n - 1);
   }
@@ -59,7 +62,7 @@ function init() {
   /* ---- state: index = device in the frame ---- */
   let index = 0, boxTimer = 0;
   function sync() {
-    root.style.setProperty("--k", index); // every device turns to (its place - index) × 30°
+    root.style.setProperty("--k", index); // every device turns to (its place - index) × STEP
     items.forEach((el, j) => el.classList.toggle("is-on", j === index));
     devs.forEach((el, j) => { el.classList.toggle("is-on", j === index); el.tabIndex = j === index ? 0 : -1; });
     box.classList.remove("is-on"); // brackets let go and close in again once the next device has arrived

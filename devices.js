@@ -36,19 +36,19 @@ function init() {
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ---- layout: device size D, frame centre (cx, cy), wheel radius R ---- */
-  const STEP = 32; // degrees between devices on the wheel
+  const STEP = 46; // degrees between devices on the wheel
   let D, secTop, step;
   function measure() {
     const vw = innerWidth, vh = root.offsetHeight;
     let cx, cy, gap; // gap = how far a neighbour sits sideways from the frame
-    if (vw < 761) { // phone: the frame sits below the details; the neighbours peek in at both edges
+    if (vw < 761) { // phone: the frame sits below the details, one device on screen
       const top = Math.max(...items.map((el) => el.offsetTop + el.offsetHeight)) + 40;
       const bottom = vh - 64;
       D = Math.min(vw * 0.72, (bottom - top) * 0.82);
-      cx = 0; cy = (top + bottom) / 2 - vh / 2; gap = vw * 0.6;
+      cx = 0; cy = (top + bottom) / 2 - vh / 2; gap = vw * 1.5; // neighbours sit off screen: one device at a time
     } else { // desktop: details left, a big frame right; the previous device shows bottom left, the next peeks in at the right edge
       D = Math.min(vw * 0.42, vh * 0.62);
-      cx = vw * 0.1; cy = vh * 0.05; gap = vw * 0.45;
+      cx = vw * 0.16; cy = vh * -0.03; gap = vw * 0.5;
     }
     root.style.setProperty("--step", STEP + "deg");
     root.style.setProperty("--dv", D + "px");

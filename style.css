@@ -26,7 +26,7 @@ a { color: inherit; text-decoration: none; }
    so the one at 0° is in the frame and its neighbours peek in at the sides */
 .dv {
   position: absolute; left: calc(50% + var(--cx, 0px)); top: calc(50% + var(--cy, 0px)); width: var(--dv, 420px); height: var(--dv, 420px); margin: calc(var(--dv, 420px) / -2) 0 0 calc(var(--dv, 420px) / -2);
-  transform-origin: 50% calc(50% + var(--r, 2000px)); transform: rotate(calc((var(--i) - var(--k, 0)) * var(--step, 32deg)));
+  transform-origin: 50% calc(50% + var(--r, 2000px)); transform: rotate(calc((var(--i) - var(--k, 0)) * var(--step, 46deg)));
   transition: transform .9s cubic-bezier(.65, 0, .35, 1), opacity .6s;
   will-change: transform; pointer-events: auto; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
 }

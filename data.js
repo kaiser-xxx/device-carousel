@@ -1,51 +1,53 @@
-/* Your devices, in order along the line (bottom left to top right).
+/* Your case studies, in order round the wheel. The first one starts in the frame.
 
-   id        passed to openDevice(id) when the centered device is clicked
+   id        passed to openDevice(id) when the device in the frame is clicked
    name      the device, used for screen readers
-   title     big name above the table when the device is centered
+   title     big name above the table
    keywords  rows in the table (label, value)
-   image     transparent image of the device with its shadow (see README for the framing)
-   href      link placeholder for the device's page
+   image     the device, front view, centred in a transparent square with its shadow
+   href      link placeholder for the case study
+   wip       true: greyed out and can't be opened (optional)
 */
 window.DEVICES = [
   {
-    id: "pixel",
+    id: "freedrama",
     name: "Pixel phone",
-    title: "Pocket Studio",
-    keywords: [["Role", "Lead designer"], ["Platform", "Android"], ["Year", "2025"], ["Type", "App"]],
-    image: "assets/pixel.webp?v=2",
+    title: "FreeDrama",
+    keywords: [["Role", "Senior Product Designer"], ["Company", "Kuku"], ["Year", "2026"], ["Platform", "Android"]],
+    image: "assets/pixel-front.webp",
     href: "#"
   },
   {
     id: "display",
     name: "Studio Display",
     title: "Control Room",
-    keywords: [["Role", "Product designer"], ["Platform", "Web"], ["Year", "2024"], ["Type", "Dashboard"]],
-    image: "assets/display.webp?v=2",
+    keywords: [["Role", "Product Designer"], ["Company", "Studio"], ["Year", "2025"], ["Platform", "Web"]],
+    image: "assets/display-front.webp",
     href: "#"
   },
   {
     id: "iphone",
     name: "iPhone",
     title: "Night Shift",
-    keywords: [["Role", "UI designer"], ["Platform", "iOS"], ["Year", "2024"], ["Type", "App"]],
-    image: "assets/iphone.webp?v=2",
+    keywords: [["Role", "UI Designer"], ["Company", "Studio"], ["Year", "2024"], ["Platform", "iOS"]],
+    image: "assets/iphone-front.webp",
     href: "#"
   },
   {
     id: "macbook",
-    name: "MacBook Pro",
+    name: "MacBook Pro and iPhone",
     title: "Field Notes",
-    keywords: [["Role", "Design lead"], ["Platform", "Web + mobile"], ["Year", "2023"], ["Type", "SaaS"]],
-    image: "assets/macbook.webp?v=2",
+    keywords: [["Role", "Design Lead"], ["Company", "Studio"], ["Year", "2023"], ["Platform", "Web + Mobile"]],
+    image: "assets/macphone-front.webp",
     href: "#"
   },
   {
-    id: "samsung",
+    id: "rocketpay",
     name: "Galaxy S23 Ultra",
-    title: "Long Weekend",
-    keywords: [["Role", "Product designer"], ["Platform", "Android"], ["Year", "2022"], ["Type", "App"]],
-    image: "assets/samsung.webp?v=2",
-    href: "#"
+    title: "RocketPay",
+    keywords: [["Role", "Product Designer"], ["Company", "RocketPay"], ["Year", "2022"], ["Platform", "Android"]],
+    image: "assets/samsung-front.webp",
+    href: "#",
+    wip: true
   }
 ];

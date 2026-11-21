@@ -1,16 +1,13 @@
 # Device Carousel
 
-A scroll-driven carousel of isometric devices, built in plain HTML, CSS and JavaScript. No framework, no build step. Sibling of [CD Carousel](https://github.com/kaiser-xxx/cd-carousel).
+A scroll-driven wheel of devices, built in plain HTML, CSS and JavaScript. No framework, no build step. Sibling of [CD Carousel](https://github.com/kaiser-xxx/cd-carousel).
 
 ## What it does
 
-- Devices sit on one isometric line, rising from bottom left to top right. It opens on the first device.
-- One scroll, swipe or arrow key moves one device along the line. The device in the middle lifts. Past the first or last device, the page scrolls normally if there is more content.
-- Corner brackets mark the centered device, and its title and details show top left.
-- Click a side device to bring it to the center. Click the centered device to open it.
-- On load the devices slide in along the path one by one.
-- On a mouse, a hovered side device nudges toward the centre.
-- Animates only transforms and opacity, so it stays smooth. Respects reduced motion.
+- The devices sit on a big wheel. Only the one inside the corner brackets is on screen; its neighbours wait off screen.
+- One scroll, swipe or arrow key turns the wheel one step, and the next device rolls into the frame. Its details show top left.
+- Click the framed device to open it. A case study marked `wip` is greyed out and can't be opened.
+- Each device turns with a CSS transition on its own transform, so the motion stays smooth. Respects reduced motion.
 
 ## Use it
 

@@ -4,7 +4,7 @@ A scroll-driven wheel of devices, built in plain HTML, CSS and JavaScript. No fr
 
 ## What it does
 
-- The devices sit on a big wheel. Only the one inside the corner brackets is on screen; its neighbours wait off screen.
+- The devices sit on a big wheel. The one inside the corner brackets is framed; the previous one shows bottom left and the next peeks in at the right edge.
 - One scroll, swipe or arrow key turns the wheel one step, and the next device rolls into the frame. Its details show top left.
 - Click the framed device to open it. A case study marked `wip` is greyed out and can't be opened.
 - Each device turns with a CSS transition on its own transform, so the motion stays smooth. Respects reduced motion.

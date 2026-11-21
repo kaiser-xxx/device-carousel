@@ -14,7 +14,7 @@ window.DEVICES = [
     name: "Pixel phone",
     title: "FreeDrama",
     keywords: [["Role", "Senior Product Designer"], ["Company", "Kuku"], ["Year", "2026"], ["Platform", "Android"]],
-    image: "assets/pixel-front.webp",
+    image: "assets/pixel-front.webp?v=2",
     href: "#"
   },
   {
@@ -22,7 +22,7 @@ window.DEVICES = [
     name: "Studio Display",
     title: "Control Room",
     keywords: [["Role", "Product Designer"], ["Company", "Studio"], ["Year", "2025"], ["Platform", "Web"]],
-    image: "assets/display-front.webp",
+    image: "assets/display-front.webp?v=2",
     href: "#"
   },
   {
@@ -30,7 +30,7 @@ window.DEVICES = [
     name: "iPhone",
     title: "Night Shift",
     keywords: [["Role", "UI Designer"], ["Company", "Studio"], ["Year", "2024"], ["Platform", "iOS"]],
-    image: "assets/iphone-front.webp",
+    image: "assets/iphone-front.webp?v=2",
     href: "#"
   },
   {
@@ -38,7 +38,7 @@ window.DEVICES = [
     name: "MacBook Pro and iPhone",
     title: "Field Notes",
     keywords: [["Role", "Design Lead"], ["Company", "Studio"], ["Year", "2023"], ["Platform", "Web + Mobile"]],
-    image: "assets/macphone-front.webp",
+    image: "assets/macphone-front.webp?v=2",
     href: "#"
   },
   {
@@ -46,7 +46,7 @@ window.DEVICES = [
     name: "Galaxy S23 Ultra",
     title: "RocketPay",
     keywords: [["Role", "Product Designer"], ["Company", "RocketPay"], ["Year", "2022"], ["Platform", "Android"]],
-    image: "assets/samsung-front.webp",
+    image: "assets/samsung-front.webp?v=2",
     href: "#",
     wip: true
   }

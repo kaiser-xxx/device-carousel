@@ -33,7 +33,7 @@ To use your own content, edit the `DEVICES` array in `data.js`:
 | `name` | The device, read out to screen readers |
 | `title` | Big name above the table |
 | `keywords` | Rows in the table (label, value) |
-| `image` | Front view of the device with its shadow, centred in a transparent square. The device is 1/2.2 of the image; the rest is room for the shadow. |
+| `image` | Front view of the device with its shadow, centred in a transparent square. The device is 1/2.4 of the image; the rest holds its whole shadow. |
 | `wip` | `true` greys it out and stops it opening (optional) |
 | `href` | Link to the device's page |
 

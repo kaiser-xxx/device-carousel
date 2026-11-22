@@ -38,6 +38,7 @@ function init() {
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const finePointer = matchMedia("(hover: hover) and (pointer: fine)").matches;
   const rad = THREE.MathUtils.degToRad;
+  const YAW = rad(25), ELEV = rad(12); // every device rests turned 25°, left side closer, seen from a little above
 
   /* ---- 3D: one small scene per device, all lit the same ---- */
   const views = devs.map((el) => {
@@ -57,7 +58,7 @@ function init() {
   const loader = new THREE.GLTFLoader().setMeshoptDecoder(THREE.MeshoptDecoder)
     .setKTX2Loader(new THREE.KTX2Loader().setTranscoderPath("vendor/basis/").detectSupport(views[0].r)); // textures stay compressed on the GPU
 
-  // centre the model, turn its screen to the camera, add its pair or phone, scale it so its width or height is 1
+  // centre the model, turn its screen to the camera, add its pair or phone, scale it so every device looks equally big
   function build(v, d, o, phone) {
     const aniso = v.r.capabilities.getMaxAnisotropy(); // keeps textures sharp on surfaces seen at an angle
     const prep = (g) => g.traverse((m) => {
@@ -81,28 +82,31 @@ function init() {
       back.position.set(-size.x * 0.85, size.y * 0.02, -size.x * 0.15);
       grp.add(back);
     }
-    if (phone) { // an iPhone standing in front of the laptop's left corner, at real-world scale (14.75 cm tall)
+    if (phone) { // an iPhone standing beside the laptop's left side, at real-world scale: 14.75 cm tall next to a 31.26 cm wide MacBook
       prep(phone);
       const ps = centre(phone), ph = new THREE.Group();
       ph.add(phone);
       ph.rotation.y = Math.PI;
-      ph.scale.setScalar(0.1475 / ps.y * (size.x / 0.298)); // the laptop is 29.8 cm wide
-      ph.position.set(-size.x * 0.4, -size.y / 2 + ps.y * ph.scale.y / 2, size.z * 0.5 + 0.02);
+      ph.scale.setScalar((0.1475 / 0.3126) * size.x / ps.y);
+      const pw = ps.x * ph.scale.x;
+      ph.position.set(-size.x / 2 - size.x * 0.08 - pw / 2, -size.y / 2 + ps.y * ph.scale.y / 2, size.z * 0.15);
       grp.add(ph);
     }
-    grp.updateMatrixWorld(true);
+    // measure it as seen at rest, then scale to the same visual weight: half its area, half its longest side
+    v.pivot.rotation.y = YAW;
+    v.pivot.add(grp);
+    v.pivot.updateMatrixWorld(true);
     const box = new THREE.Box3();
     grp.traverse((m) => { if (m.isMesh && !m.name.startsWith("pen")) box.expandByObject(m); }); // size by the device, not an S Pen
-    const s = box.getSize(new THREE.Vector3()), k = 1 / Math.max(s.x, s.y);
+    const s = box.getSize(new THREE.Vector3()), k = 0.85 / (Math.sqrt(s.x * s.y) / 2 + Math.max(s.x, s.y) / 2); // area alone makes a lone tall phone look huge
     grp.scale.setScalar(k);
-    grp.position.copy(box.getCenter(new THREE.Vector3())).multiplyScalar(-k);
-    v.pivot.add(grp);
+    grp.position.copy(v.pivot.worldToLocal(box.getCenter(new THREE.Vector3()))).multiplyScalar(-k);
 
-    // camera straight in front (a little above for desks and laptops), light upper left, soft shadow on a wall behind
-    const dir = new THREE.Vector3(0, Math.sin(rad(d.elev || 0)), Math.cos(rad(d.elev || 0)));
+    // camera in front, a little above; light upper left; soft shadow on a wall behind
+    const dir = new THREE.Vector3(0, Math.sin(ELEV), Math.cos(ELEV));
     v.cam = new THREE.PerspectiveCamera(27, 1, 0.01, 100); // about a 50 mm lens
     v.cam.position.copy(dir).multiplyScalar(0.8 / Math.tan(rad(13.5)));
-    v.cam.zoom = 0.8 / 1.1; // the canvas is 2.2 device sizes wide, room for the whole shadow
+    v.cam.zoom = 0.8 / 1.1; // the canvas is 2.2 frame sizes wide, room for the whole shadow
     v.cam.updateProjectionMatrix();
     v.cam.lookAt(0, 0, 0);
     const sun = new THREE.DirectionalLight(0xffffff, 1.2);
@@ -171,15 +175,14 @@ function init() {
     views.forEach((v, i) => {
       if (!v.ready) return;
       const on = i === index && root.classList.contains("dv-in");
-      if (!on) v.tx = v.ty = 0;
       v.lift += ((on && !reduce ? 0.03 : 0) - v.lift) * 0.08;
       v.x += (v.tx - v.x) * 0.1;
       v.y += (v.ty - v.y) * 0.1;
-      if (!v.drag) { v.spin += v.vel; v.vel *= 0.94; }
-      if (Math.abs(v.vel) < 1e-4) v.vel = 0;
+      if (!v.drag) { v.vel = (v.vel - v.spin * 0.05) * 0.8; v.spin += v.vel; } // let go: springs back to the resting angle
+      if (Math.abs(v.vel) < 1e-4 && Math.abs(v.spin) < 1e-3) v.vel = v.spin = 0;
       const float = on && !reduce ? Math.sin(now / 650) * 0.012 : 0;
-      if (float || v.vel || Math.abs(v.tx - v.x) > 0.01 || Math.abs(v.ty - v.y) > 0.01 || Math.abs((on ? 0.03 : 0) - v.lift) > 0.0005) busy = true;
-      v.pivot.rotation.set(rad(v.y), v.spin + rad(v.x), 0);
+      if (float || v.vel || v.spin || Math.abs(v.tx - v.x) > 0.01 || Math.abs(v.ty - v.y) > 0.01 || Math.abs((on ? 0.03 : 0) - v.lift) > 0.0005) busy = true;
+      v.pivot.rotation.set(rad(v.y), YAW + v.spin + rad(v.x), 0);
       v.pivot.position.y = v.lift + float;
       const key = v.pivot.rotation.x.toFixed(4) + v.pivot.rotation.y.toFixed(4) + v.pivot.position.y.toFixed(4);
       if (key !== v.key) { v.key = key; v.r.render(v.scene, v.cam); }
@@ -249,7 +252,7 @@ function init() {
     move(dir);
   }
 
-  // the framed device: drag left/right to spin it (it keeps turning a little, then stays), tilt toward the mouse.
+  // every device tilts toward the mouse; the framed one can be dragged left/right to spin it, and springs back on release.
   // A side device turns into the frame on click; the framed one opens (unless it's not ready yet)
   let spinning = false, dragged = false;
   devs.forEach((el, i) => {
@@ -261,7 +264,7 @@ function init() {
       v.drag = true; v.vel = 0;
     });
     el.addEventListener("pointermove", (e) => {
-      if (finePointer && i === index && !reduce) { // tilt: up to ±8° sideways, ±4° up and down
+      if (finePointer && v.ready && !reduce) { // tilt: up to ±8° sideways, ±4° up and down
         const r = el.getBoundingClientRect();
         v.tx = ((e.clientX - r.left) / r.width - 0.5) * 16;
         v.ty = ((e.clientY - r.top) / r.height - 0.5) * 8;
@@ -276,7 +279,7 @@ function init() {
       const dx = (e.clientX - lastX) * 0.012;
       lastX = e.clientX;
       v.spin += dx;
-      v.vel = reduce ? 0 : dx;
+      v.vel = 0;
       kick();
     });
     const end = () => { v.drag = false; spinning = false; kick(); };

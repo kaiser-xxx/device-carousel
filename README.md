@@ -38,10 +38,9 @@ To use your own content, edit the `DEVICES` array in `data.js`:
 | `keywords` | Rows in the table (label, value) |
 | `model` | `.glb` of the device, compressed (see below). Any scale: it is fitted to size |
 | `image` | Still of the same model in a transparent square, shown until the model loads. The device is 1/2.2 of the image |
-| `elev` | Degrees the camera looks down from, a little for desks and laptops (optional) |
 | `front` | Degrees to turn the model so its screen faces you (optional) |
 | `pair` | `true` shows two copies, back behind and screen in front (optional) |
-| `phone` | `.glb` of a phone to stand in front of the laptop's left corner (optional) |
+| `phone` | `.glb` of a phone to stand beside the laptop (optional) |
 | `wip` | `true` greys it out and stops it opening (optional) |
 | `href` | Link to the device's page |
 

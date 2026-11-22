@@ -38,7 +38,7 @@ function init() {
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const finePointer = matchMedia("(hover: hover) and (pointer: fine)").matches;
   const rad = THREE.MathUtils.degToRad;
-  const YAW = rad(25), ELEV = rad(12); // every device rests turned 25°, left side closer, seen from a little above
+  const YAW = rad(-25), ELEV = rad(12); // every device rests turned 25°, right side closer, seen from a little above
 
   /* ---- 3D: one small scene per device, all lit the same ---- */
   const views = devs.map((el) => {
@@ -82,23 +82,23 @@ function init() {
       back.position.set(-size.x * 0.85, size.y * 0.02, -size.x * 0.15);
       grp.add(back);
     }
-    if (phone) { // an iPhone standing beside the laptop's left side, at real-world scale: 14.75 cm tall next to a 31.26 cm wide MacBook
+    if (phone) { // an iPhone standing beside the laptop's right side, the side turned toward you, at real-world scale: 14.75 cm tall next to a 31.26 cm wide MacBook
       prep(phone);
       const ps = centre(phone), ph = new THREE.Group();
       ph.add(phone);
       ph.rotation.y = Math.PI;
       ph.scale.setScalar((0.1475 / 0.3126) * size.x / ps.y);
       const pw = ps.x * ph.scale.x;
-      ph.position.set(-size.x / 2 - size.x * 0.08 - pw / 2, -size.y / 2 + ps.y * ph.scale.y / 2, size.z * 0.15);
+      ph.position.set(size.x / 2 + size.x * 0.04 + pw / 2, -size.y / 2 + ps.y * ph.scale.y / 2, size.z * 0.15);
       grp.add(ph);
     }
-    // measure it as seen at rest, then scale to the same visual weight: half its area, half its longest side
+    // measure it as seen at rest, then scale to the same visual weight: half its area, half its height
     v.pivot.rotation.y = YAW;
     v.pivot.add(grp);
     v.pivot.updateMatrixWorld(true);
     const box = new THREE.Box3();
     grp.traverse((m) => { if (m.isMesh && !m.name.startsWith("pen")) box.expandByObject(m); }); // size by the device, not an S Pen
-    const s = box.getSize(new THREE.Vector3()), k = 0.85 / (Math.sqrt(s.x * s.y) / 2 + Math.max(s.x, s.y) / 2); // area alone makes a lone tall phone look huge
+    const s = box.getSize(new THREE.Vector3()), k = Math.min(0.85 / (Math.sqrt(s.x * s.y) / 2 + s.y / 2), 1.25 / s.x); // area alone makes a lone tall phone look huge; capped to the frame width
     grp.scale.setScalar(k);
     grp.position.copy(v.pivot.worldToLocal(box.getCenter(new THREE.Vector3()))).multiplyScalar(-k);
 
@@ -106,7 +106,7 @@ function init() {
     const dir = new THREE.Vector3(0, Math.sin(ELEV), Math.cos(ELEV));
     v.cam = new THREE.PerspectiveCamera(27, 1, 0.01, 100); // about a 50 mm lens
     v.cam.position.copy(dir).multiplyScalar(0.8 / Math.tan(rad(13.5)));
-    v.cam.zoom = 0.8 / 1.1; // the canvas is 2.2 frame sizes wide, room for the whole shadow
+    v.cam.zoom = 0.8 / 1.25; // the canvas is 2.5 frame sizes wide, room for the whole shadow
     v.cam.updateProjectionMatrix();
     v.cam.lookAt(0, 0, 0);
     const sun = new THREE.DirectionalLight(0xffffff, 1.2);
@@ -118,10 +118,10 @@ function init() {
     sun.shadow.bias = -0.0005;
     sun.shadow.normalBias = 0.01;
     Object.assign(sun.shadow.camera, { left: -1.5, right: 1.5, top: 1.5, bottom: -1.5, near: 0.1, far: 30 });
-    const wall = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), new THREE.ShadowMaterial({ opacity: 0.11 }));
+    const wall = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), new THREE.ShadowMaterial({ opacity: 0.11, depthWrite: false }));
     wall.receiveShadow = true; // invisible wall just behind the device that only shows the shadow
     wall.lookAt(dir);
-    wall.position.copy(dir).multiplyScalar(-(s.z * k / 2 + 0.12));
+    wall.position.copy(dir).multiplyScalar(-Math.min(s.z * k / 2 + 0.12, 0.3)); // capped: a deep laptop would throw its shadow off the canvas
     v.scene.add(sun, sun.target, wall);
   }
 
@@ -157,7 +157,7 @@ function init() {
     root.style.setProperty("--cx", cx + "px");
     root.style.setProperty("--cy", cy + "px");
     root.style.setProperty("--r", gap / Math.sin(STEP * Math.PI / 180) + "px"); // the radius that puts a neighbour exactly gap sideways
-    views.forEach((v) => { v.r.setSize(D * 2.2, D * 2.2, false); v.key = ""; });
+    views.forEach((v) => { v.r.setSize(D * 2.5, D * 2.5, false); v.key = ""; });
     kick();
     secTop = sec.getBoundingClientRect().top + scrollY;
     step = Math.max(1, sec.offsetHeight - vh) / Math.max(1, n - 1);
